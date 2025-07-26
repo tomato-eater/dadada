@@ -21,9 +21,9 @@ public class Player : MonoBehaviour
         //è„â∫
         float tu = 0f;
         if(Input.GetKey(KeyCode.UpArrow))
-            tu = 0.2f;
-        if (Input.GetKey(KeyCode.DownArrow))
             tu = -0.2f;
+        if (Input.GetKey(KeyCode.DownArrow))
+            tu = 0.2f;
         //ç∂âE
         float lr = 0f;
         if (Input.GetKey(KeyCode.LeftArrow))
@@ -31,11 +31,11 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.RightArrow))
             lr = 0.2f;
 
-        var q = Quaternion.AngleAxis(0, transform.forward);
+        Vector4 rot = new Vector4(tu, lr, 0, 1);
 
-        //Matrix4x4 rotMat4x4 = Matrix4x4.Rotate(Quaternion.Euler(tu, lr, 0));
+        Matrix4x4 rotMat4x4 = Matrix4x4.Rotate(Quaternion.Euler(rot));
 
-        //mat4x4 *= (traMat4x4 * rotMat4x4);
+        mat4x4 *= (traMat4x4 * rotMat4x4);
     }
 
     private void FixedUpdate()
