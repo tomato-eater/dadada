@@ -4,38 +4,54 @@ public class Player : MonoBehaviour
 {
     Matrix4x4 mat4x4 = Matrix4x4.identity;
 
+    private void Start()
+    {
+    }
+
     // Update is called once per frame
     void Update()
     {
-        //移動
-        //前後
-        Vector3 vec = new Vector3 { };
-        if (Input.GetKey(KeyCode.W))
-            vec.z = 0.2f;
-        if (Input.GetKey(KeyCode.S))
-            vec.z = -0.2f;
-
-        Matrix4x4 traMat4x4 = Matrix4x4.Translate(vec);
-
-        //回転
-        //上下
-        float tu = 0f;
-        if(Input.GetKey(KeyCode.UpArrow))
-            tu = -0.2f;
+        //回転   
+        float udRot = 0f;     //上下
+        if (Input.GetKey(KeyCode.UpArrow))
+            udRot = -0.5f;
         if (Input.GetKey(KeyCode.DownArrow))
-            tu = 0.2f;
-        //左右
-        float lr = 0f;
+            udRot = 0.5f;
+        var xRot = Quaternion.AngleAxis(udRot, Vector3.right);
+
+        float lrRot = 0f;     //左右
         if (Input.GetKey(KeyCode.LeftArrow))
-            lr = -0.2f;
+            lrRot = -0.5f;   
         if (Input.GetKey(KeyCode.RightArrow))
-            lr = 0.2f;
+            lrRot = 0.5f;
 
-        Vector4 rot = new Vector4(tu, lr, 0, 1);
+        // 現在の回転を取得
+        var nowRot = Quaternion.Euler(mat4x4.rotation.eulerAngles);
 
-        Matrix4x4 rotMat4x4 = Matrix4x4.Rotate(Quaternion.Euler(rot));
+        // 左右の回転を適用
+        var yRot = Quaternion.AngleAxis(lrRot, Vector3.up);
 
-        mat4x4 *= (traMat4x4 * rotMat4x4);
+        // 新しい回転を計算
+        var nextRot = yRot * nowRot * xRot;
+
+
+        //移動
+        var move = Vector3.zero;
+        if (Input.GetKey(KeyCode.W))
+            move.z = 0.1f;
+        if (Input.GetKey(KeyCode.S))
+            move.z = -0.1f;
+
+        // 現在位置を取得
+        Vector3 nowPos = mat4x4.GetColumn(3);
+
+        // 向いている方向に移動
+        Vector3 worldMove = nextRot * move;
+        Vector3 newPos = nowPos + worldMove;
+
+        // 回転・位置を反映
+        mat4x4 = Matrix4x4.Rotate(nextRot);
+        mat4x4.SetColumn(3, new Vector4(newPos.x, newPos.y, newPos.z, 1));
     }
 
     private void FixedUpdate()
